@@ -11,8 +11,12 @@ on:
   schedule:
     - cron: "0 0 * * *" # 5 位 POSIX：每天 00:00 UTC（CST 08:00）
 
+# OIDC 免密换证：GitHub 平台使用华为云 IAM 中注册的 GitHubActions 身份提供商，
+# 无需配置任何 Secrets；id-token: write 缺失时上传步骤会报
+# 「缺少 ACTIONS_ID_TOKEN_REQUEST_URL / ACTIONS_ID_TOKEN_REQUEST_TOKEN 环境变量」
 permissions:
   contents: read
+  id-token: write
 
 concurrency:
   group: gosec-scan-${{ github.ref }}
@@ -44,11 +48,9 @@ jobs:
 
       - name: Upload SARIF to openLiBing
         if: ${{ always() }}
-        uses: openlibing-test/upload-sarif-action@main
+        uses: openlibing-test/upload-sarif-action@source-platform-detection
         with:
           sarif_file: reports/gosec.sarif
           source_path: .
           category: "business"
-          obs-ak: ${{ secrets.OBS_AK }}
-          obs-sk: ${{ secrets.OBS_SK }}
           # env_type: beta   # 需回传测试环境时取消注释（默认 prod）
