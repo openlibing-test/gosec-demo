@@ -52,5 +52,5 @@ jobs:
         with:
           sarif_file: reports/gosec.sarif
           source_path: .
-          category: "business"
-          # env_type: beta   # 需回传测试环境时取消注释（默认 prod）
+          category: "business-github"
+          env_type: beta   # 需回传测试环境时取消注释（默认 prod）
