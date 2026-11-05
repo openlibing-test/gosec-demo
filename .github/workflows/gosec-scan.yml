@@ -1,0 +1,54 @@
+name: gosec-upload-sarif
+
+# 场景二：workflow 单独使用（GitHub Actions）
+# 触发：手动 / push / PR / 定时
+on:
+  workflow_dispatch:
+  push:
+    branches: ["main"] # 换成业务仓默认分支名
+  pull_request:
+    branches: ["main"]
+  schedule:
+    - cron: "0 0 * * *" # 5 位 POSIX：每天 00:00 UTC（CST 08:00）
+
+permissions:
+  contents: read
+
+concurrency:
+  group: gosec-scan-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  gosec-scan-upload:
+    name: Gosec 扫描 - SARIF - 上传
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: setup-go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.23"
+          cache: true
+
+      # 安装与扫描放在同一步，避免 go install 的 PATH 修改无法跨 step 继承
+      - name: 安装 gosec 并扫描
+        run: |
+          export PATH="$PATH:$(go env GOPATH)/bin"
+          go install github.com/securego/gosec/v2/cmd/gosec@v2.22.4
+          gosec -version
+          mkdir -p reports
+          gosec -no-fail -conf gosec.json -fmt sarif -out reports/gosec.sarif \
+            -exclude-dir vendor -exclude-generated ./...
+
+      - name: Upload SARIF to openLiBing
+        if: ${{ always() }}
+        uses: openlibing-test/upload-sarif-action@main
+        with:
+          sarif_file: reports/gosec.sarif
+          source_path: .
+          category: "business"
+          obs-ak: ${{ secrets.OBS_AK }}
+          obs-sk: ${{ secrets.OBS_SK }}
+          # env_type: beta   # 需回传测试环境时取消注释（默认 prod）

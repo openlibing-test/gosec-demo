@@ -1,0 +1,8 @@
+.idea/
+*.exe
+/bin/
+/vendor/
+/reports/
+
+# workflow 安装的 gosec（勿提交二进制）
+.github/bin/
