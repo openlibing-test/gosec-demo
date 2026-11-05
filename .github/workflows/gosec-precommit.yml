@@ -56,6 +56,7 @@ jobs:
       - name: Verify SARIF report
         if: ${{ always() }}
         run: |
+          echo "pre-commit sarif-files output: '${{ steps.pre-commit.outputs.sarif-files }}'"
           ls -la /tmp/pre-commit-reports/ || true
           test -s /tmp/pre-commit-reports/gosec.sarif
 
@@ -65,5 +66,5 @@ jobs:
         with:
           sarif_file: /tmp/pre-commit-reports/gosec.sarif
           source_path: .
-          category: "business-github"
-          env_type: beta   # 需回传测试环境时取消注释（默认 prod）
+          category: business
+          env_type: beta   # openlibing-test 验证仓固定回传测试环境；业务仓默认 prod 可删此行

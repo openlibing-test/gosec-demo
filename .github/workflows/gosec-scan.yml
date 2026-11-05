@@ -44,7 +44,7 @@ jobs:
           gosec -version
           mkdir -p reports
           gosec -no-fail -conf gosec.json -fmt sarif -out reports/gosec.sarif \
-            -exclude-dir vendor -exclude-generated ./...
+            -exclude-dir=vendor -exclude-generated ./...
 
       - name: Upload SARIF to openLiBing
         if: ${{ always() }}
@@ -52,5 +52,5 @@ jobs:
         with:
           sarif_file: reports/gosec.sarif
           source_path: .
-          category: "business-github"
-          env_type: beta   # 需回传测试环境时取消注释（默认 prod）
+          category: "business"
+          env_type: beta   # openlibing-test 验证仓固定回传测试环境；业务仓默认 prod 可删此行

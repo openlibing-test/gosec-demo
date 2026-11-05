@@ -1,10 +1,11 @@
 {
   "global": {
-    "exclude": "G104"
+    "audit": true
   },
+  "exclude": ["G104"],
   "exclude-rules": [
     {
-      "path": "internal/(mock|fake|stub)s?/.*",
+      "path": "vendor/.*",
       "rules": ["*"]
     }
   ],
