@@ -7,7 +7,8 @@ repos:
   # ===================== Go 语言 =====================
   # local hook：直接调 gosec，依赖本机 Go 工具链 + go install 安装的 gosec
   # - language: system：pre-commit 不创建隔离环境，直接执行 entry
-  # - pass_filenames: false + ./...：gosec 必须按包/模块扫描；pre-commit 默认传文件列表会导致 results 为空
+  # - pass_filenames: false + ./...：模块级全量扫描；types: [go] 仅决定有 Go 文件变更时是否触发，不是增量
+  # - Windows 本地验证时 entry 需指向 gosec.exe（pre-commit 不自动补全扩展名）
   # - require_serial：避免分批覆盖 SARIF 输出
   # - -fmt sarif + -out：直接生成 SARIF v2.1.0 到 pre-commit-action 约定的报告目录
   - repo: local
