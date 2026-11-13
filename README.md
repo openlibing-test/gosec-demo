@@ -45,9 +45,11 @@
 
 ```bash
 mkdir -p .github/bin /tmp/pre-commit-reports
-GOBIN="$(pwd)/.github/bin" go install github.com/securego/gosec/v2/cmd/gosec@v2.22.4
+GOBIN="$(pwd)/.github/bin" go install github.com/securego/gosec/v2/cmd/gosec@v2.30.0
 pip install pre-commit
 pre-commit run gosec --all-files
 ```
 
-Windows 原生 shell 需改 hook 里 `-out=` 路径（见文档 FAQ）。
+> 需本机 Go ≥1.26（gosec v2.30.0 的构建要求）；workflow 中已安装 Go 1.26，与仓库 `go.mod` 的 `go 1.23` 不冲突。
+>
+> Windows 原生 shell 建议把 hook 的 `-out=` 改为 `C:/tmp/pre-commit-reports/gosec.sarif`，并将 `entry` 指向 `gosec.exe`（pre-commit 不自动补全扩展名，见文档 FAQ）。

@@ -1,8 +1,8 @@
 {
   "global": {
-    "audit": true
+    "audit": true,
+    "exclude": "G104"
   },
-  "exclude": ["G104"],
   "exclude-rules": [
     {
       "path": "vendor/.*",
