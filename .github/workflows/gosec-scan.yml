@@ -33,27 +33,18 @@ jobs:
       - name: setup-go
         uses: actions/setup-go@v5
         with:
-          # 取 max(go.mod 的 go 指令, gosec 要求的最低 Go)；gosec v2.30.0 要求 Go >= 1.26
-          go-version: "1.26"
-          # 超大仓库可改为 false，避免缓存保存阶段磁盘耗尽导致整条 run 失败
+          go-version: "1.23"
           cache: true
 
       # 安装与扫描放在同一步，避免 go install 的 PATH 修改无法跨 step 继承
       - name: 安装 gosec 并扫描
         run: |
           export PATH="$PATH:$(go env GOPATH)/bin"
-          go install github.com/securego/gosec/v2/cmd/gosec@v2.30.0
+          go install github.com/securego/gosec/v2/cmd/gosec@v2.22.4
           gosec -version
           mkdir -p reports
           gosec -no-fail -conf gosec.json -fmt sarif -out reports/gosec.sarif \
             -exclude-dir=vendor -exclude-generated ./...
-
-      # 打印结果条数：0 条可能是确实无问题，也可能是包加载失败（结合日志 type errors 判断）
-      - name: Check SARIF results
-        if: ${{ always() }}
-        run: |
-          test -f reports/gosec.sarif || exit 0
-          echo "gosec results: $(grep -o '"ruleId"' reports/gosec.sarif | wc -l)"
 
       - name: Upload SARIF to openLiBing
         if: ${{ always() }}
